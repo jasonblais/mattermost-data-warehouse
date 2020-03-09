@@ -15,6 +15,7 @@ WITH server_details AS (
         MAX(CASE WHEN active_user_count > 0 THEN date ELSE NULL END) AS last_active_user_date,
         MAX(CASE WHEN license_id1 IS NOT NULL or license_id2 IS NOT NULL THEN date ELSE NULL END) AS last_active_license_date
     FROM {{ ref('server_daily_details') }}
+    WHERE date <= CURRENT_DATE - INTERVAL '1 day'
     GROUP BY 1
 ),
 server_fact AS (

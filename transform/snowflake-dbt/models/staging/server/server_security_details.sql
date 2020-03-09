@@ -30,6 +30,7 @@ WITH security                AS (
       AND sec.ip_address <> '194.30.0.184'
       AND sec.user_count >= sec.active_user_count
       AND NULLIF(sec.id, '') IS NOT NULL
+      AND sec.timestamp::date <= current_date - interval '1 day'
     {% if is_incremental() %}
 
         -- this filter will only be applied on an incremental run
