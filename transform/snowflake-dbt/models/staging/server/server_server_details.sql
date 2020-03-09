@@ -11,11 +11,10 @@ WITH max_timestamp              AS (
       , MAX(server.timestamp)  AS max_timestamp
       , COUNT(server.user_id)  AS occurrences
     FROM {{ source('mattermost2', 'server') }}
-    WHERE server.timestamp::DATE <= CURRENT_DATE - interval '1 day'
     {% if is_incremental() %}
 
         -- this filter will only be applied on an incremental run
-        AND server.timestamp::DATE > (SELECT MAX(date) FROM {{ this }})
+        WHERE server.timestamp::DATE > (SELECT MAX(date) FROM {{ this }})
 
     {% endif %}
     GROUP BY 1, 2
