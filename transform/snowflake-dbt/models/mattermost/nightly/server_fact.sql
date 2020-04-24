@@ -48,15 +48,17 @@ WITH server_details AS (
     first_server_edition AS (
       SELECT
           s.server_id
-        , MAX(CASE WHEN sd.first_edition_date = s.date THEN s.edition ELSE NULL END)      AS first_server_edition
-        , MAX(CASE WHEN sd.last_edition_date = s.date THEN s.edition ELSE NULL END)       AS edition
-        , MAX(sd.first_edition_date)                                                      AS first_edition_date
-        , MAX(sd.last_edition_date)                                                       AS last_edition_date
+        , MAX(CASE WHEN sd.first_edition_date = s.date THEN s.edition ELSE NULL END)              AS first_server_edition
+        , MAX(CASE WHEN sd.last_edition_date = s.date THEN s.edition ELSE NULL END)               AS edition
+        , MAX(sd.first_edition_date)                                                              AS first_edition_date
+        , MAX(sd.last_edition_date)                                                               AS last_edition_date
+        , MAX(CASE WHEN sd.first_telemetry_active_date = s.date THEN s.ip_address ELSE NULL END)  AS first_ip_address
       FROM server_details sd
       JOIN {{ ref('server_daily_details') }} s
            ON sd.server_id = s.server_id
            AND (sd.first_edition_date = s.date
-           OR sd.last_edition_date = s.date)
+           OR sd.last_edition_date = s.date
+           OR sd.first_telemetry_active_date)
       GROUP BY 1
     ),
   last_server_date AS (
@@ -96,6 +98,8 @@ WITH server_details AS (
       , MAX(server_details.first_server_version)          AS first_server_version
       , MAX(fse.edition)                                  AS server_edition
       , MAX(fse.first_server_edition)                     AS first_server_edition
+      , MAX(server_daily_details.ip_address)              AS ip_address
+      , MAX(fse.first_ip_address)                         AS first_ip_address
       , MAX(server_details.first_telemetry_active_date)   AS first_telemetry_active_date
       , MAX(server_details.last_telemetry_active_date)    AS last_telemetry_active_date
       , MAX(server_details.first_mm2_telemetry_date)      AS first_mm2_telemetry_date
