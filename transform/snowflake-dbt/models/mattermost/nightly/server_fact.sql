@@ -58,7 +58,7 @@ WITH server_details AS (
            ON sd.server_id = s.server_id
            AND (sd.first_edition_date = s.date
            OR sd.last_edition_date = s.date
-           OR sd.first_telemetry_active_date)
+           OR sd.first_telemetry_active_date = s.date)
       GROUP BY 1
     ),
   last_server_date AS (
